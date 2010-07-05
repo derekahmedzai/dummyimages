@@ -1,0 +1,4 @@
+name = Dummy images
+description = Generate dummy images at any size you like.
+core = 6.x
+version = 6.x-1.0
