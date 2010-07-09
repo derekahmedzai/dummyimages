@@ -3,7 +3,7 @@
  * @file
  * Dummy images module - Generate dummy images at any size you like.
  */
- 
+
 // dummyimages
 
 /**
@@ -63,7 +63,7 @@ function dummyimages_admin() {
     '#type' => 'select',
     '#title' => t('Font'),
     '#default_value' => variable_get('dummyimages_font', 'Vera.ttf'),
-	'#options' => _list_available_fonts(),
+    '#options' => _list_available_fonts(),
     '#description' => t("Choose a font."),
     '#required' => FALSE,
   );
@@ -96,10 +96,10 @@ function dummyimages_menu() {
   
   $items['dummyimage/%'] = array(
     'title' => 'Dummy image',
-	'page callback' => 'dummyimages_generate_image',
-	'page arguments' => array(1),
+    'page callback' => 'dummyimages_generate_image',
+    'page arguments' => array(1),
     'access arguments' => array('administer dummyimages'),
-	'type' => MENU_CALLBACK,
+    'type' => MENU_CALLBACK,
   );
 
   return $items;
@@ -119,13 +119,13 @@ function dummyimages_generate_image($arg) {
   // default value
   if (count($dimensions) < 2 || empty($dimensions[0]) || empty($dimensions[1])) {
     $dimensions = array(100, 100);
-	$error = 'Invalid size';
+    $error = 'Invalid size';
   }
   
   // too big?
   if ($dimensions[0] * $dimensions[1] > 4096000) { // max 2560x1600
     $dimensions = array(100, 100);
-	$error = 'Too big';
+    $error = 'Too big';
   }
   
   // OK, make image
@@ -134,37 +134,40 @@ function dummyimages_generate_image($arg) {
   
   // set font size
   $fontsize = $width/8; // 16 was too small //I came up with 16 to scale the text size based on the width.
-  if($fontsize<= 5) { //I do set a minimum font size so it is still sort of legible at very small image sizes.
+  if ($fontsize<= 5) { //I do set a minimum font size so it is still sort of legible at very small image sizes.
     $fontsize = 5;
   }
   
   // get script directory
-  $script_directory = substr($_SERVER['SCRIPT_FILENAME'], 0, strrpos($_SERVER['SCRIPT_FILENAME'], '/'));
+  //$script_directory = substr($_SERVER['SCRIPT_FILENAME'], 0, strrpos($_SERVER['SCRIPT_FILENAME'], '/'));
+  $script_directory = realpath('.');
   
   // set font path
-  $font = realpath($script_directory .'/'. drupal_get_path('module', 'dummyimages') .'/fonts/'. variable_get('dummyimages_font', 'Vera.ttf'));
+  //$font = realpath($script_directory .'/'. drupal_get_path('module', 'dummyimages') .'/fonts/'. variable_get('dummyimages_font', 'Vera.ttf'));
+  $font = $script_directory .'/'. drupal_get_path('module', 'dummyimages') .'/fonts/'. variable_get('dummyimages_font', 'Vera.ttf');
   
   // get colours
   $bgcolour = explode(',', variable_get('dummyimages_bgcolour', '204, 204, 204'));
   $colour = explode(',', variable_get('dummyimages_colour', '0, 0, 0'));
   
   // create image
-  $im = imagecreatetruecolor($width,$height); // need to use true colour if require alpha transparency
+  $im = imagecreatetruecolor($width, $height); // need to use true colour if require alpha transparency
   $gray = imageColorAllocate($im, $bgcolour[0], $bgcolour[1], $bgcolour[2]); //Set the color gray for the background color. Hex value = #CCCCCC
   $darker_gray = imageColorAllocate($im, $bgcolour[0] - 16, $bgcolour[1] - 16, $bgcolour[2] - 16); //Set the color gray for the background color. Hex value = #CCCCCC
   $black = imagecolorallocatealpha($im, $colour[0], $colour[1], $colour[2], 60); //Set the black color for the text
   
   // display error message if there is one
   if (empty($error)) {
-    if ($width == $height){
+    if ($width == $height) {
       //$text = $width."²"; // power of two // only bitstream fonts
       //$text = $width."^2"; // power of two // not chunkfive
       $text = $width; // just one dimension
     }
-	else {
-	  $text = $width." x ".$height; //This is the text string that will go right in the middle of the gray rectangle.
-	} 
-  } else {
+    else {
+      $text = $width .' x '. $height; //This is the text string that will go right in the middle of the gray rectangle.
+    } 
+  }
+  else {
     $text = $error;
   }
   
@@ -179,13 +182,17 @@ function dummyimages_generate_image($arg) {
   imageFilledRectangle($im, 0, $height/2, $width, $height, $darker_gray); //Darker overlay for chrome effect
   imagettftext($im, $fontsize, $angle, $textX, $textY, $black, $font, $text); //Create and positions the text http://us2.php.net/manual/en/function.imagettftext.php
   header('Content-type: image/png'); //Set the header so the browser can interpret it as an image and not a bunch of weird text.
-	
-  imagepng($im); //Create the final PNG image
-  imageDestroy($im);//Destroy the image to free memory.
-	  
+
+  //Create the final PNG image
+  imagepng($im);
+
+  //Destroy the image to free memory.
+  imageDestroy($im);
+
 } // function dummyimages_generate_image
 
-function imagettfbbox_t($size, $angle, $fontfile, $text){ //Ruquay K Calloway http://ruquay.com/sandbox/imagettf/ made a better function to find the coordinates of the text bounding box so I used it.
+function imagettfbbox_t($size, $angle, $fontfile, $text) {
+    //Ruquay K Calloway http://ruquay.com/sandbox/imagettf/ made a better function to find the coordinates of the text bounding box so I used it.
     // compute size with a zero angle
     $coords = imagettfbbox($size, 0, $fontfile, $text);
     // convert angle to radians
@@ -195,25 +202,27 @@ function imagettfbbox_t($size, $angle, $fontfile, $text){ //Ruquay K Calloway ht
     $sa = sin($a);
     $ret = array();
     // perform transformations
-    for($i = 0; $i < 7; $i += 2){
+    for ($i = 0; $i < 7; $i += 2) {
         $ret[$i] = round($coords[$i] * $ca + $coords[$i+1] * $sa);
         $ret[$i+1] = round($coords[$i+1] * $ca - $coords[$i] * $sa);
     }
     return $ret;
 }
 
-function _list_available_fonts(){
+function _list_available_fonts() {
   // get script directory
-  $script_directory = substr($_SERVER['SCRIPT_FILENAME'], 0, strrpos($_SERVER['SCRIPT_FILENAME'], '/'));
+  //$script_directory = substr($_SERVER['SCRIPT_FILENAME'], 0, strrpos($_SERVER['SCRIPT_FILENAME'], '/'));
+  $script_directory = realpath('.');
   
   // get font dir
-  $font_directory = realpath($script_directory .'/'. drupal_get_path('module', 'dummyimages') .'/fonts');
+  //$font_directory = realpath($script_directory .'/'. drupal_get_path('module', 'dummyimages') .'/fonts');
+  $font_directory = $script_directory .'/'. drupal_get_path('module', 'dummyimages') .'/fonts';
   
   // get fonts
   $fonts = file_scan_directory($font_directory, 'otf|ttf');
   $available_fonts = array();
-  foreach ($fonts as $font){
- 	$available_fonts[$font->basename] = $font->basename;
+  foreach ($fonts as $font) {
+    $available_fonts[$font->basename] = $font->basename;
   }
   
   return $available_fonts;

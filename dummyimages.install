@@ -1,4 +1,6 @@
 <?php
+// $Id$
+
 /**
  * @file
  * Install/uninstall hooks for the dummy images module.
@@ -22,7 +24,7 @@ function dummyimages_install() {
  * Implementation of hook_enable().
  */
 function dummyimages_enable() {
-  drupal_set_message(t("Dummy images settings are available at !link", 
+  drupal_set_message(t("Dummy images settings are available at !link",
     array( '!link' => l('Administer > Site configuration > Dummy images ',  'admin/settings/dummyimages' ) )
   ));
 }
@@ -41,6 +43,6 @@ function dummyimages_uninstall() {
   // remove persistent variables
   db_query("DELETE FROM {variable} WHERE name LIKE 'dummyimages_%%'");
   cache_clear_all('variables', 'cache');
-  
+
   drupal_set_message(t("Persistent variables have been deleted (dummyimages_%)."));
 }

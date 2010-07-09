@@ -3,6 +3,11 @@ Dummy images is a module to generate dummy images..
 Based on Dynamic Dummy Image Generator by Russell Heimlich (@kingkool68)
 http://dummyimage.com/
 
+Features
+----------------------------------------
+See a live preview of the new text as you type.
+The maximum image size is 2560x1600.
+
 Installation
 ----------------------------------------
 Copy the dummyimages module folder to your module directory and then 
